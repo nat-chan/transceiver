@@ -12,7 +12,7 @@ source venv/bin/activate
 cd custom_nodes
 git clone https://github.com/nat-chan/comfyui-in-memory-transceiver
 cd comfyui-in-memory-transceiver
-pip install -r requirements.txt
+pip install -e .
 cd ../.. # cd /path/to/ComfyUI
 python main.py # launch
 ```
