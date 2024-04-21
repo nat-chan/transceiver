@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import comfy_annotations
 from comfy_annotations import ComfyFunc, ImageTensor, MaskTensor, NumberInput, Choice, StringInput
+import torch
 import numpy as np
 from multiprocessing import shared_memory
 import atexit
@@ -13,13 +14,13 @@ MANAGED_NAME = set()
 @ComfyFunc(
     category="Image",
     display_name="SaveImageMem",
-    is_output_node=False,
+    is_output_node=True,
     debug=True
 )
 def save_image_mem(
         image: ImageTensor, 
         name: str = StringInput("ComfyUI", multiline=False),
-    ):
+    ) -> None:
     """
     画像を入力としてうけつけ、shared memoryを作成する
     """.strip()
@@ -34,7 +35,7 @@ def save_image_mem(
         shared_array = np.ndarray(array.shape, dtype=array.dtype, buffer=shm.buf)
         np.copyto(shared_array, array)
     original_array = image.detach().cpu().numpy()
-    shape_array = np.ndarray(original_array.shape, dtype=np.uint8)
+    shape_array = np.asarray(original_array.shape, dtype=np.uint8)
     _save(original_array, f"{name}.data")
     _save(shape_array, f"{name}.shape")
     MANAGED_NAME.add(name)
@@ -56,6 +57,28 @@ def release_all() -> None:
     for name in MANAGED_NAME:
         release(f"{name}.data")
         release(f"{name}.shape")
+
+@ComfyFunc(
+    category="Image",
+    display_name="LoadImageMem",
+    is_output_node=False,
+    debug=True
+)
+def load_image_mem(
+        name: str = StringInput("ComfyUI", multiline=False),
+    ) -> ImageTensor:
+    """
+    nameで指定された画像をshared memoryから読み込む
+    """.strip()
+    global MANAGED_NAME
+    data_shm = shared_memory.SharedMemory(name=f"{name}.data")
+    shape_shm = shared_memory.SharedMemory(name=f"{name}.shape")
+    shape_array = np.ndarray(shape=[-1], dtype=np.uint8, buffer=shape_shm.buf)
+#    print("="*10)
+#    print(shape_array)
+    shared_array = np.ndarray(shape=shape_array, dtype=np.uint8, buffer=data_shm.buf)
+    tensor_image = torch.tensor(shared_array)
+    return tensor_image
 
 NODE_CLASS_MAPPINGS.update(comfy_annotations.NODE_CLASS_MAPPINGS)
 NODE_DISPLAY_NAME_MAPPINGS.update(comfy_annotations.NODE_DISPLAY_NAME_MAPPINGS)
