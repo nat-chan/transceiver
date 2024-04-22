@@ -9,6 +9,7 @@ dependencies = [
     "fs>=2.4.16",
     "comfyui-annotations @ git+https://github.com/andrewharp/ComfyUI-Annotations",
     "numpy>=1.26.4",
+    "pyarrow>=16.0.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"
