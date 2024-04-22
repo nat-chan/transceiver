@@ -1,6 +1,6 @@
 import comfy_annotations
 
-import transceiver.save_image_mem
+import transceiver.custom_nodes
 
 NODE_CLASS_MAPPINGS = {}
 NODE_DISPLAY_NAME_MAPPINGS = {}

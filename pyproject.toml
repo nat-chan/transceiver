@@ -1,8 +1,13 @@
 [project]
 name = "transceiver"
-version = "0.1.1"
+version = "0.1.2"
 description = "transceiver is a Python library that swiftly exchanges complex data structures such as numpy arrays and PIL images between processes, optimizing AI inference tasks that utilize ComfyUI."
-dependencies = [ "fs>=2.4.16", "numpy>=1.26.4", "pyarrow>=16.0.0",]
+dependencies = [
+    "fs>=2.4.16",
+    "numpy>=1.26.4",
+    "pyarrow>=16.0.0",
+    "pillow>=10.3.0",
+]
 readme = "README.md"
 requires-python = ">= 3.10"
 classifiers = [ "Programming Language :: Python :: 3", "License :: OSI Approved :: MIT License", "Operating System :: OS Independent",]
@@ -30,12 +35,12 @@ target-version = "py310"
 [tool.rye.workspace]
 members = [ "repositories/**/*",]
 
-[tool.hatch.metadata]
-allow-direct-references = true
-
 [tool.ruff.lint]
 exclude = [ ".venv",]
 select = [ "B", "C4", "E", "G", "W", "F", "I", "UP", "EXE", "F", "SIM1", "LOG", "NPY", "PERF", "PGH004", "PIE794", "PIE800", "PIE804", "PIE807", "PIE810", "PLC0131", "PLC0132", "PLC0205", "PLE", "PLR0133", "PLR0206", "PLR1722", "PLW0129", "PLW0406", "PLW0711", "PLW1509", "PLW3301", "PT006", "PT022", "PT023", "PT024", "PT025", "PT026", "PYI", "RUF008", "RUF015", "RUF016", "RUF017", "TRY200", "TRY302",]
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = [ "src/transceiver",]
