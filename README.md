@@ -1,4 +1,4 @@
-# comfyui-in-memory-transceiver
+# transceiver
 
 ## why?
 
