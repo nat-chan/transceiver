@@ -1,44 +1,50 @@
 #!/usr/bin/env python3
-import comfy_annotations
-from comfy_annotations import ComfyFunc, ImageTensor, MaskTensor, NumberInput, Choice, StringInput
-import torch
-import numpy as np
-from multiprocessing import shared_memory
 import atexit
+from multiprocessing import shared_memory
+
+import comfy_annotations
+import numpy as np
+import torch
+from comfy_annotations import ComfyFunc, ImageTensor, StringInput
 
 NODE_CLASS_MAPPINGS = {}
 NODE_DISPLAY_NAME_MAPPINGS = {}
 
 MANAGED_NAME = set()
 
+
 @ComfyFunc(
     category="Image",
     display_name="SaveImageMem",
     is_output_node=True,
-    debug=True
+    debug=True,
 )
 def save_image_mem(
-        image: ImageTensor, 
-        name: str = StringInput("ComfyUI", multiline=False),
-    ) -> None:
+    image: ImageTensor,
+    name: str = StringInput("ComfyUI", multiline=False),
+):
     """
     画像を入力としてうけつけ、shared memoryを作成する
     """.strip()
     global MANAGED_NAME
+
     def _save(array: np.ndarray, name: str) -> None:
-        # TODO nameが既に存在する場合を考慮していない
-#        try:
-#            shm = shared_memory.SharedMemory(name=name)
-#        except FileNotFoundError:
-#            pass
+        try:
+            shm = shared_memory.SharedMemory(name=name)
+            shm.close()
+            shm.unlink()
+        except FileNotFoundError:
+            pass
         shm = shared_memory.SharedMemory(create=True, size=array.nbytes, name=name)
         shared_array = np.ndarray(array.shape, dtype=array.dtype, buffer=shm.buf)
         np.copyto(shared_array, array)
+
     original_array = image.detach().cpu().numpy()
     shape_array = np.asarray(original_array.shape, dtype=np.uint8)
     _save(original_array, f"{name}.data")
     _save(shape_array, f"{name}.shape")
     MANAGED_NAME.add(name)
+
 
 def release(name: str) -> None:
     """
@@ -47,6 +53,7 @@ def release(name: str) -> None:
     shm = shared_memory.SharedMemory(name=name)
     shm.close()
     shm.unlink()
+
 
 @atexit.register
 def release_all() -> None:
@@ -58,15 +65,13 @@ def release_all() -> None:
         release(f"{name}.data")
         release(f"{name}.shape")
 
+
 @ComfyFunc(
-    category="Image",
-    display_name="LoadImageMem",
-    is_output_node=False,
-    debug=True
+    category="Image", display_name="LoadImageMem", is_output_node=False, debug=True
 )
 def load_image_mem(
-        name: str = StringInput("ComfyUI", multiline=False),
-    ) -> ImageTensor:
+    name: str = StringInput("ComfyUI", multiline=False),
+) -> ImageTensor:
     """
     nameで指定された画像をshared memoryから読み込む
     """.strip()
@@ -74,11 +79,12 @@ def load_image_mem(
     data_shm = shared_memory.SharedMemory(name=f"{name}.data")
     shape_shm = shared_memory.SharedMemory(name=f"{name}.shape")
     shape_array = np.ndarray(shape=[-1], dtype=np.uint8, buffer=shape_shm.buf)
-#    print("="*10)
-#    print(shape_array)
+    #    print("="*10)
+    #    print(shape_array)
     shared_array = np.ndarray(shape=shape_array, dtype=np.uint8, buffer=data_shm.buf)
     tensor_image = torch.tensor(shared_array)
     return tensor_image
+
 
 NODE_CLASS_MAPPINGS.update(comfy_annotations.NODE_CLASS_MAPPINGS)
 NODE_DISPLAY_NAME_MAPPINGS.update(comfy_annotations.NODE_DISPLAY_NAME_MAPPINGS)
