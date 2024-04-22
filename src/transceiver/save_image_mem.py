@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import atexit
+import uuid
 from multiprocessing import shared_memory
 
 import comfy_annotations
@@ -83,6 +84,34 @@ def load_image_mem(
     #    print(shape_array)
     shared_array = np.ndarray(shape=shape_array, dtype=np.uint8, buffer=data_shm.buf)
     tensor_image = torch.tensor(shared_array)
+    return tensor_image
+
+
+@ComfyFunc(
+    category="Image",
+    display_name="TestImageMem",
+    is_output_node=True,
+    debug=True,
+)
+def test_image_mem(
+    image: ImageTensor,
+) -> ImageTensor:
+    name = str(uuid.uuid4())
+    array = image.detach().cpu().numpy()
+
+    shm = shared_memory.SharedMemory(
+        create=True, size=array.nbytes, name=f"{name}.data"
+    )
+
+    print(array.nbytes)
+
+    shared_array = np.ndarray(array.shape, dtype=array.dtype, buffer=shm.buf)
+    np.copyto(shared_array, array)
+
+    shm2 = shared_memory.SharedMemory(name=f"{name}.data")
+    shared_array2 = np.ndarray(shape=array.shape, dtype=array.dtype, buffer=shm2.buf)
+
+    tensor_image = torch.tensor(shared_array2)
     return tensor_image
 
 
