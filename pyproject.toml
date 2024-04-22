@@ -1,18 +1,23 @@
 [project]
 name = "transceiver"
 version = "0.1.0"
-description = "Add your description here"
+description = "transceiver is a Python library that swiftly exchanges complex data structures such as numpy arrays and PIL images between processes, optimizing AI inference tasks that utilize ComfyUI."
 authors = [
     { name = "nat-chan", email = "ogino.natsuki.tm@alumni.tsukuba.ac.jp" }
 ]
 dependencies = [
     "fs>=2.4.16",
-    "comfyui-annotations @ git+https://github.com/andrewharp/ComfyUI-Annotations",
+#    "comfyui-annotations @ git+https://github.com/andrewharp/ComfyUI-Annotations",
     "numpy>=1.26.4",
     "pyarrow>=16.0.0",
 ]
 readme = "README.md"
-requires-python = ">= 3.8"
+requires-python = ">= 3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -26,6 +31,8 @@ dev-dependencies = [
     "mypy",
     "pydantic",
     "pytest",
+    "build>=1.2.1",
+    "twine>=5.0.0",
 ]
 
 [tool.hatch.metadata]
@@ -33,6 +40,14 @@ allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/transceiver"]
+
+[tool.rye.workspace]
+members = ["repositories/**/*"]
+
+
+[project.urls]
+Homepage = "https://github.com/nat-chan/transceiver"
+Issues = "https://github.com/nat-chan/transceiver/issues"
 
 [tool.ruff]
 line-length = 88
