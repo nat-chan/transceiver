@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import atexit
 import uuid
 from multiprocessing import shared_memory
@@ -26,7 +25,7 @@ def save_image_mem(
 ):
     """
     画像を入力としてうけつけ、shared memoryを作成する
-    """.strip()
+    """
     global MANAGED_NAME
 
     def _save(array: np.ndarray, name: str) -> None:
@@ -50,7 +49,7 @@ def save_image_mem(
 def release(name: str) -> None:
     """
     nameで指定されたshared memoryをクリーンアップ
-    """.strip()
+    """
     shm = shared_memory.SharedMemory(name=name)
     shm.close()
     shm.unlink()
@@ -75,7 +74,7 @@ def load_image_mem(
 ) -> ImageTensor:
     """
     nameで指定された画像をshared memoryから読み込む
-    """.strip()
+    """
     global MANAGED_NAME
     data_shm = shared_memory.SharedMemory(name=f"{name}.data")
     shape_shm = shared_memory.SharedMemory(name=f"{name}.shape")

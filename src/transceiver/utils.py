@@ -46,23 +46,20 @@ def dtype_from_str(dtype: str) -> np.dtype:
     return np.dtype(dtype)
 
 
-def serialize_data_field(data_field: dict) -> bytes:
+def data_field_to_bytes(data_field: dict) -> bytes:
     """
     data_fieldをシリアライズして返す
     dictのkey, valueはliteral_eval()可能なもののみを受け付ける
     """.strip()
     serialized = repr(data_field).encode("utf-8")
-    length = len(serialized)
-    print("length", length)
-    print("max_length", max_length)
     return serialized
 
 
-def deserialize_data_field(serialized: bytes) -> dict:
+def data_field_from_buffer(serialized: memoryview) -> dict:
     """
     シリアライズされたdata_fieldを元に戻す
     """.strip()
-    return ast.literal_eval(serialized.decode("utf-8"))
+    return ast.literal_eval(serialized.tobytes().decode("utf-8"))
 
 
 def length_to_bytes(length: int) -> bytes:
