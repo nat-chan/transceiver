@@ -5,8 +5,7 @@ description = "transceiver is a Python library that swiftly exchanges complex da
 dependencies = [
     "fs>=2.4.16",
     "numpy>=1.26.4",
-    "pyarrow>=16.0.0",
-    "pillow>=10.3.0",
+    "comfyui-annotations @ git+https://github.com/andrewharp/ComfyUI-Annotations",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"
@@ -25,15 +24,22 @@ Issues = "https://github.com/nat-chan/transceiver/issues"
 
 [tool.rye]
 managed = true
-dev-dependencies = [ "ipykernel>=6.29.4", "ruff", "mypy", "pydantic", "pytest", "build>=1.2.1", "twine>=5.0.0", "toml>=0.10.2",]
+dev-dependencies = [
+    "ipykernel>=6.29.4",
+    "ruff",
+    "mypy",
+    "pydantic",
+    "pytest",
+    "build>=1.2.1",
+    "twine>=5.0.0",
+    "toml>=0.10.2",
+    "grip>=4.6.2",
+]
 
 [tool.ruff]
 line-length = 88
 indent-width = 4
 target-version = "py310"
-
-[tool.rye.workspace]
-members = [ "repositories/**/*",]
 
 [tool.ruff.lint]
 exclude = [ ".venv",]

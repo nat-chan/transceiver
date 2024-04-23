@@ -1,4 +1,4 @@
-# Transceiver 📡
+# Transceiver📡
 
 Transceiver is a python library that swiftly exchanges fundamental data structures, specifically numpy arrays, between processes, optimizing AI inference tasks that utilize ComfyUI.
 
