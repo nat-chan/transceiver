@@ -12,8 +12,8 @@ When processing a large number of requests, the SaveImage and LoadImage nodes ma
 cd /path/to/ComfyUI
 source venv/bin/activate
 cd custom_nodes
-git clone https://github.com/nat-chan/transceiver
-cd transceiver
+git clone https://github.com/nat-chan/transceiver comfyui-transceiver
+cd comfyui-transceiver
 pip install -e .
 cd ../.. # cd /path/to/ComfyUI
 python main.py # launch
