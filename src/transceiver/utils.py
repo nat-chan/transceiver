@@ -1,7 +1,10 @@
+import ast
+
 import numpy as np
 
 # 2bytesで最大65535-2のフィールドサイズを確保できる。
 offset_nbytes = 2
+max_length = 2 ** (8 * offset_nbytes) - offset_nbytes
 
 dtypes_list = [
     np.int8,
@@ -43,12 +46,35 @@ def dtype_from_str(dtype: str) -> np.dtype:
     return np.dtype(dtype)
 
 
-def test_dtype_to_str():
-    array = np.zeros(shape=[10**7], dtype=np.uint8)
-    dtype_str = dtype_to_str(array)
-    print(dtype_str)
-    assert dtype_from_str(dtype_str) == array.dtype
+def serialize_data_field(data_field: dict) -> bytes:
+    """
+    data_fieldをシリアライズして返す
+    dictのkey, valueはliteral_eval()可能なもののみを受け付ける
+    """.strip()
+    serialized = repr(data_field).encode("utf-8")
+    length = len(serialized)
+    print("length", length)
+    print("max_length", max_length)
+    return serialized
 
 
-if __name__ == "__main__":
-    test_dtype_to_str()
+def deserialize_data_field(serialized: bytes) -> dict:
+    """
+    シリアライズされたdata_fieldを元に戻す
+    """.strip()
+    return ast.literal_eval(serialized.decode("utf-8"))
+
+
+def length_to_bytes(length: int) -> bytes:
+    """
+    literal data fieldの長さを offset_nbytes bytesで表現
+    """
+    return length.to_bytes(length=offset_nbytes, byteorder="big")
+
+
+def length_from_bytes(length_bytes: bytes) -> int:
+    """
+    バッファ末尾からoffset_nbytes取り出したbytesを
+    literal data fieldの長さとして解釈して返す
+    """
+    return int.from_bytes(length_bytes, byteorder="big")
