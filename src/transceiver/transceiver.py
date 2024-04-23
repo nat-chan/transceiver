@@ -1,14 +1,35 @@
-from multiprocessing import shared_memory
+from multiprocessing import shared_memory  # noqa
+import ast  # noqa
 import numpy as np
-import ast
-
-#{'type': }
+from typing import Literal
 
 
-print(
-    str(np.uint8)
-)
+"""shmのデータアライメント
+┃                 numpy array buffer              ┃   literal data field   ┃ offset  ┃
+┠────┼────┼────┼────┼────┼────┼────┼────┼────┼────╂────┼────┼────┼────┼────╂────┼────┨
+┃    │    │    │    │    │    │    │    │    │    ┃    │    │    │    │    ┃    │    ┃
+┠────┼────┼────┼────┼────┼────┼────┼────┼────┼────╂────┼────┼────┼────┼────╂────┼────┨
+┃                 numpy array nbytes              ┃    offset - 2 bytes    ┃ 2 bytes ┃
+""".strip()
+
+
+data_format_t = Literal[
+    "numpy",
+    "pytorch",
+    "PIL",
+]
+data_format_list = data_format_t.__args__
+
 
 class Transceiver:
-    pass
+    def __init__(self):
+        pass
 
+    def read(self, name: str) -> np.ndarray:
+        pass
+
+    def write(self, name: str, data_format: data_format_t):
+        pass
+
+    def write_numpy(self, name: str, array: np.ndarray):
+        pass
