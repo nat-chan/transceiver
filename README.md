@@ -1,25 +1,17 @@
 # Transceiver📡
 
-Transceiver is a python library that swiftly exchanges fundamental data structures, specifically numpy arrays, between processes, optimizing AI inference tasks that utilize ComfyUI.
+Please see [**comfyui-transceiver**](https://github.com/nat-chan/comfyui-transceiver),  the ComfyUI custom nodes binding of the "transceiver" library.
+
+
+"transceiver" is a python library that swiftly exchanges fundamental data structures, specifically numpy arrays, between processes, optimizing AI inference tasks that utilize ComfyUI.
 
 ## Why?
 
 When processing a large number of requests, the SaveImage and LoadImage nodes may be IO-limited, and using shared memory improves performance by passing images only through memory access, not through IO.
 
-## Install as ComfyUI custom nodes
+## Installation
 
-```bash
-cd /path/to/ComfyUI
-source venv/bin/activate
-cd custom_nodes
-git clone https://github.com/nat-chan/transceiver comfyui-transceiver
-cd comfyui-transceiver
-pip install -e .
-cd ../.. # cd /path/to/ComfyUI
-python main.py # launch
-```
-
-## Install as Python library
+The "transceiver" is indexed by PyPI. You can easily integrate it into any project.
 
 ```bash
 pip install transceiver
@@ -27,10 +19,7 @@ pip install transceiver
 
 ## Features
 
-### SaveImageMem
 
-todo
+UNDER CONSTRUCTION
 
-### LoadImageMem
-
-todo
+See [core.py](/src/transceiver/core.py) doc

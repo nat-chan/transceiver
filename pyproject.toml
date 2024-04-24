@@ -1,11 +1,9 @@
 [project]
 name = "transceiver"
 version = "0.1.2"
-description = "transceiver is a Python library that swiftly exchanges complex data structures such as numpy arrays and PIL images between processes, optimizing AI inference tasks that utilize ComfyUI."
+description = "Transceiver is a python library that swiftly exchanges fundamental data structures, specifically numpy arrays, between processes, optimizing AI inference tasks that utilize ComfyUI."
 dependencies = [
-    "fs>=2.4.16",
     "numpy>=1.26.4",
-    "comfyui-annotations @ git+https://github.com/andrewharp/ComfyUI-Annotations",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"
@@ -15,7 +13,7 @@ name = "nat-chan"
 email = "ogino.natsuki.tm@alumni.tsukuba.ac.jp"
 
 [build-system]
-requires = [ "hatchling",]
+requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project.urls]
