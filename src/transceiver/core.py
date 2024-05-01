@@ -11,6 +11,34 @@ __doc__ = """shmのデータアライメント
 ┃    │    │    │    │    │    │    │    │    │    ┃    │    │    │    │    ┃    │    ┃
 ┠────┼────┼────┼────┼────┼────┼────┼────┼────┼────╂────┼────┼────┼────┼────╂────┼────┨
 ┃                 numpy array nbytes              ┃    offset - 2 bytes    ┃ 2 bytes ┃
+
+TODO:
+- 大きいchannelにはより小さいデータを流せるようにする
+- writeを以下の二つに分ける
+    - create channel
+    - send to channel
+- readを以下に変更
+    - receive from channel
+- pidをもって、createしたプロセスがatexitでchannelをclose, unlink
+- prefixをsuffixに変更
+- マシンをまたいだ通信でやり取りするためにバッファの送受信を実装
+- 格納するデータを勘案
+    - dtype マスト
+    - shape マスト
+    - buffer マスト
+    - 配列長 大きいvolumeに小さいデータを流すには必要
+    - pid 解放時に必要だが、マシンをまたぐ場合はこの情報は上書きされる
+    - 最後に変更されたunixtime 変更チェックにこれを使うと良い？
+        - reciever側が、保持しているデータをupdateするべきか判定できればよい。
+- send to channelが持つべき引数
+    - if channel is already exist
+        - raise error
+        - create channel
+        - send data if buffer <= volume 
+- receive from channel
+    - if channel is not exist
+        - raise error
+        - wait until channel is open
 """.strip()
 
 
@@ -31,15 +59,15 @@ class Transceiver:
         self.shm: dict[str, shared_memory.SharedMemory] = {}
 
     @staticmethod
-    def pre(name: str) -> str:
-        """管理を容易にするために共通するprefixを付ける"""
-        return f"transceiver-{name}"
+    def p(name: str) -> str:
+        """管理を容易にするために共通するsuffixを付ける"""
+        return f"{name}.transceiver"
 
     def release(self, name: str):
         """
         nameで指定されたshared memoryを解放する
         """
-        shm = shared_memory.SharedMemory(name=self.pre(name))
+        shm = shared_memory.SharedMemory(name=self.p(name))
         shm.close()
         shm.unlink()
 
@@ -48,9 +76,9 @@ class Transceiver:
         shared memoryからnumpy arrayを読み込む
         メモリ上で共有されたnumpy arrayを作成して返す
         """
-        pname = self.pre(name)
+        pname = self.p(name)
         try:
-            self.shm[pname] = shared_memory.SharedMemory(name=self.pre(name))
+            self.shm[pname] = shared_memory.SharedMemory(name=self.p(name))
         except FileNotFoundError as err:
             raise RuntimeError(f"{name}が存在していません") from err
 
@@ -81,7 +109,7 @@ class Transceiver:
         メモリ上で共有されたnumpy arrayを作成して返す
         共有されたarrayのshapeやdtypeの変更などは即時には反映されない
         """
-        pname = self.pre(name)
+        pname = self.p(name)
         data_field = {
             "data_format": "numpy",
             "shape": array.shape,
@@ -96,7 +124,7 @@ class Transceiver:
         self.shm[pname] = shared_memory.SharedMemory(
             create=True,
             size=array.nbytes + data_field_nbytes + utils.offset_nbytes,
-            name=self.pre(name),
+            name=self.p(name),
         )
 
         # write numpy buffer

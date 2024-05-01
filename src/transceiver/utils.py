@@ -75,3 +75,9 @@ def length_from_bytes(length_bytes: bytes) -> int:
     literal data fieldの長さとして解釈して返す
     """
     return int.from_bytes(length_bytes, byteorder="big")
+
+def calculate_numpy_nbytes(dtype: np.dtype, shape: tuple) -> int:
+    """
+    与えられたdtypeとshapeを使用して、numpy arrayのnbytesを計算する。
+    """
+    return np.prod(shape) * np.dtype(dtype).itemsize
